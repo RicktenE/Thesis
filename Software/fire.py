@@ -29,13 +29,13 @@ class Fire(DynamicModel):
 
     potentialNewFire = ifthenelse(self.neighbourBurns & ~boolean(self.fire) , boolean(1), boolean(0))
 
-    realization = uniform(1) < 0.35
+    realization = uniform(1) < 0.65
 
     NewFire = ifthenelse(potentialNewFire & realization, boolean(1), boolean(0))
     # self.report(NewFire, 'FireEdge')
 
     # writing for ml application. Save entire map each timestep as a long flat array
-    fire_array = pcr2numpy(self.fire, 0)
+    fire_array = pcr2numpy(self.fire, -9999)
     flat_fire = fire_array.flatten()
     global array_for_ml
     array_for_ml = np.append(array_for_ml, flat_fire)
@@ -52,7 +52,7 @@ class Fire(DynamicModel):
 
 
 
-nrOfTimeSteps=50
+nrOfTimeSteps=55
 myModel = Fire()
 dynamicModel = DynamicFramework(myModel,nrOfTimeSteps)
 dynamicModel.run()
