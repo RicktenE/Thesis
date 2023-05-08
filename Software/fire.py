@@ -15,7 +15,8 @@ class Fire(DynamicModel):
     self.fire = readmap('start.map')
     self.fire = scalar(self.fire)
 
-    self.dem = readmap('dem.map')
+    self.dem = self.readmap('dem')
+    self.gradient = slope(self.dem)
 
     #get the number of pixels for the machine learning model
     global number_pixels
@@ -29,30 +30,61 @@ class Fire(DynamicModel):
 
     potentialNewFire = ifthenelse(self.neighbourBurns & ~boolean(self.fire) , boolean(1), boolean(0))
 
-    realization = uniform(1) < 0.65
+    # fire_elevation = self.dem * self.fire
+    # PNF_elevation = scalar(potentialNewFire) * scalar(self.dem)
+    #
+    # # function part
+    # def elevation_probability(firemap, diagonal, shift, fire_elevation, PNF_elevation):
+    #   import math as m
+    #   F_neighbor_elevation = ifthenelse(firemap == 1, 0, shift0(fire_elevation, shift[0], shift[1]))
+    #
+    #   if diagonal == True:
+    #     angle = atan(((scalar(boolean(F_neighbor_elevation)) * PNF_elevation) - F_neighbor_elevation)*(-1) / m.sqrt(2))
+    #   else:
+    #     angle = atan(((scalar(boolean(F_neighbor_elevation)) * PNF_elevation) - F_neighbor_elevation)*(-1))
+    #
+    #   angle_trans = ifthenelse(scalar(angle) > 180, scalar(angle) - 360, scalar(angle))
+    #   prob_elev = m.e ** (0.1 * scalar(angle_trans)) * scalar(boolean(F_neighbor_elevation))
+    #   return prob_elev
+    #
+    # p_NW = elevation_probability(self.fire,  True, [1, 1] , fire_elevation, PNF_elevation)
+    # p_NE = elevation_probability(self.fire,  True, [1, -1], fire_elevation, PNF_elevation)
+    # p_SE = elevation_probability(self.fire,  True, [-1, -1], fire_elevation, PNF_elevation)
+    # p_SW = elevation_probability(self.fire,  True, [-1, 1], fire_elevation, PNF_elevation)
+    # p_N = elevation_probability(self.fire,  False, [1, 0], fire_elevation, PNF_elevation)
+    # p_E = elevation_probability(self.fire,  False, [0, -1], fire_elevation, PNF_elevation)
+    # p_S = elevation_probability(self.fire,  False, [-1, 0], fire_elevation, PNF_elevation)
+    # p_W = elevation_probability(self.fire,  False, [0, 1], fire_elevation, PNF_elevation)
+    #
+    # pElevation = p_N + p_S + p_W + p_E + p_NW + p_NE + p_SW + p_SE
+    #
+    #
+    # p = 0.1  * pElevation
+    p = 0.25
+    realization = scalar(uniform(1) <= p)
 
-    NewFire = ifthenelse(potentialNewFire & realization, boolean(1), boolean(0))
+    NewFire = ifthenelse(boolean(potentialNewFire) & boolean(realization), boolean(1), boolean(0))
     # self.report(NewFire, 'FireEdge')
 
     # writing for ml application. Save entire map each timestep as a long flat array
-    fire_array = pcr2numpy(self.fire, -9999)
+    fire_array = pcr2numpy(self.fire, -1)
     flat_fire = fire_array.flatten()
     global array_for_ml
     array_for_ml = np.append(array_for_ml, flat_fire)
 
     #just a check to see if it works properly
-    print('        ')
-    print(array_for_ml)
+    # print('        ')
+    # print(array_for_ml)
 
 
     #update fire status
     self.fire = (self.fire + scalar(NewFire))
-    print('check')
+    # print('check')
     self.report(self.fire, 'fire')
 
 
 
-nrOfTimeSteps=55
+nrOfTimeSteps=80
 myModel = Fire()
 dynamicModel = DynamicFramework(myModel,nrOfTimeSteps)
 dynamicModel.run()
