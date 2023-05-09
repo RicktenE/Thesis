@@ -1,6 +1,10 @@
 from pcraster import *
 from pcraster.framework import *
+import numpy as np
 
+array_for_ml = np.empty(0)
+horizontal_pixels = 0
+vertical_pixels = 0
 
 class MyFirstModel(DynamicModel):
     def __init__(self):
@@ -18,6 +22,11 @@ class MyFirstModel(DynamicModel):
 
         self.snow = 0.0
 
+        global horizontal_pixels
+        global vertical_pixels
+        # number_pixels = len(pcr2numpy(dem, 0).flatten())
+        horizontal_pixels = len(pcr_as_numpy(dem)[1,:])
+        vertical_pixels = len(pcr_as_numpy(dem)[:,1])
     def dynamic(self):
         precipitation = timeinputscalar('precip.tss', 1)
         self.report(precipitation, 'pFromTss')
@@ -45,6 +54,21 @@ class MyFirstModel(DynamicModel):
 
         runoffGenerated = actualMelt + rainFall
         self.report(runoffGenerated, 'rg')
+
+        # writing for ml application. Save entire map each timestep as a long flat array.
+        # Where there are NaN's replace with -1 for visual representation in ML classification of 1's and 0's. if Nan's set to -9999
+        # The rest of the values are not visible anymore
+
+        # print(type(self.snow))
+
+        snow_array = pcr2numpy(self.snow, -1)
+        snow_runoff = snow_array.flatten()
+        global array_for_ml
+        array_for_ml = np.append(array_for_ml, snow_runoff)
+
+        # just a check to see if it works properly
+        # print('        ')
+        # print(array_for_ml)
 
         self.report(self.snow, 'snow')
 

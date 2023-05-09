@@ -1,4 +1,4 @@
-def neighbour_as_feature(data, number_of_pixels):
+def neighbour_as_feature(data, horizontal_pixels, vertical_pixels):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -11,11 +11,11 @@ def neighbour_as_feature(data, number_of_pixels):
     import pandas as pd
     import numpy as np
 
-    N = int(np.sqrt(number_of_pixels)) #get the length of the square frame
+    N = horizontal_pixels #get the length of one row of pixels
     data = data
 
-    print(len(data))
-    print(N)
+    print('Total number of data points : ', len(data))
+    print('Length of one row of pixels, horizontal side of the grid: ', N)
 
     df = pd.DataFrame()
 
@@ -49,11 +49,11 @@ def neighbour_as_feature(data, number_of_pixels):
     df["bottom_left"].iloc[:(N - 1)] = df["x_input"].iloc[:(N - 1)]  # fix nans
 
     #Set results of timestep as label for previous timestep
-    df["y_label"] = df["x_input"].shift(-(number_of_pixels))
+    df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
 
     #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
     #This result is the last
-    df = df.iloc[:-number_of_pixels]
+    df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
 
     #### !! ###
     # Deal with the edges somehow

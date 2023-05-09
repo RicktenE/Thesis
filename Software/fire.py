@@ -20,9 +20,14 @@ class Fire(DynamicModel):
     self.report(self.gradient, 'gradient')
 
     #get the number of pixels for the machine learning model
-    global number_pixels
-    number_pixels = len(pcr2numpy(self.dem, 0).flatten())
+    # global number_pixels
+    # number_pixels = len(pcr2numpy(self.dem, 0).flatten())
 
+    global horizontal_pixels
+    global vertical_pixels
+    # number_pixels = len(pcr2numpy(dem, 0).flatten())
+    horizontal_pixels = len(pcr_as_numpy(self.fire)[1, :])
+    vertical_pixels = len(pcr_as_numpy(self.fire)[:, 1])
   def dynamic(self):
 
     neighbours = window4total(self.fire)
