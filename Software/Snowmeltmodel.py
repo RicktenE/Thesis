@@ -5,6 +5,7 @@ import numpy as np
 array_for_ml = np.empty(0)
 horizontal_pixels = 0
 vertical_pixels = 0
+timesteps = 0
 
 class MyFirstModel(DynamicModel):
     def __init__(self):
@@ -74,6 +75,7 @@ class MyFirstModel(DynamicModel):
 
 
 nrOfTimeSteps = 100
+timesteps = nrOfTimeSteps
 myModel = MyFirstModel()
 dynamicModel = DynamicFramework(myModel, nrOfTimeSteps)
 dynamicModel.run()

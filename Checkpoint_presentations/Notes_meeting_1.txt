@@ -1,0 +1,51 @@
+
+Multi variate RF 
+-------------------------------------------------------------------------
+Multivariate random forests, WIREs Data Mining Knowl Discov 2011 1 80–87, DOI: 10.1002/widm.12 I believe the latest version of Scikit-learn also supports this. A good review of the state of the art can be found in the thesis by Henrik Linusson entitled "MULTI-OUTPUT RANDOM FORESTS".
+
+https://scikit-learn.org/stable/modules/generated/sklearn.multioutput.MultiOutputRegressor.html
+
+https://scikit-learn.org/stable/auto_examples/tree/plot_tree_regression_multioutput.html#sphx-glr-auto-examples-tree-plot-tree-regression-multioutput-py
+------------------------------------------------------------------------
+
+
+
+Multi timesteps
+------------------------------------------------------------------------
+
+https://machinelearningmastery.com/how-to-develop-machine-learning-models-for-multivariate-multi-step-air-pollution-time-series-forecasting/
+------------------------------------------------------------------------
+
+
+Main focus on general. Goal to emulate 'things' really quickly. 
+
+For report: heavy focus on creating the dataset
+
+-- not too much time on NaN. 
+
+- CNN
+- RF
+
+
+
+
+Run simulation several times and then predict complete simulation
+
+train on several parameters 
+- Change Fire predictions on DEM
+- Test with different forcing ? 
+- split in space/time   
+
+
+train on several parameters to train the model 
+- snowmelt
+- add parameters to training data
+
+
+
+forward simulation 
+- several timesteps (include time dependent driver)
+
+
+Forward simulation
+- multiple plrediction.  (tuple predictions?)

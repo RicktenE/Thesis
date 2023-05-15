@@ -1,4 +1,4 @@
-def neighbour_as_feature(data, horizontal_pixels, vertical_pixels):
+def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, multiplesteps = False):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -51,9 +51,10 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels):
     #Set results of timestep as label for previous timestep
     df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
 
-    #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
-    #This result is the last
-    df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
+    if not multiplesteps:
+        #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
+        #This result is the last
+        df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
 
     #### !! ###
     # Deal with the edges somehow
