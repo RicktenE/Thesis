@@ -1,4 +1,7 @@
-def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, multiplesteps = False):
+import pandas as pd
+
+
+def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -9,17 +12,13 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, multiplesteps
         rows are the last timestep. """
 
     import pandas as pd
-    import numpy as np
 
-    N = horizontal_pixels #get the length of one row of pixels
-    data = data
-
-    print('Total number of data points : ', len(data))
-    print('Length of one row of pixels, horizontal side of the grid: ', N)
+    # get the length of one row of pixels
+    N = horizontal_pixels
 
     df = pd.DataFrame()
 
-    #structure the timesteps
+    # structure the timesteps
     df["x_input"] = pd.DataFrame(data)
 
     # Add the neighbours as predictive variables
@@ -27,7 +26,6 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, multiplesteps
     df["left"].iloc[-1:] = df["x_input"].iloc[:1]  # fix nans
 
     df["top_left"] = df["x_input"].shift(-(N + 1))
-    # df["top_left"] = df["x_input"].shift(-6)
     df["top_left"].iloc[-(N + 1):] = df["x_input"].iloc[:(N + 1)]  # fix nans
 
     df["top"] = df["x_input"].shift(-(N))
@@ -51,19 +49,45 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, multiplesteps
     #Set results of timestep as label for previous timestep
     df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
 
+
+
     if not multiplesteps:
         #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
         #This result is the last
         df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
 
-    #### !! ###
-    # Deal with the edges somehow
-
-    #--!! Ratio of Area/edges decreases by 4x/(x^2) for a square grid. therefore the larger the simulation the smaller the
-    # error due to the wrong neighbour classification at the edges.
-
-    # Perhaps check how much of an influence this hold and from when it becomes irrelevent
-
-    ### !! ###
+    if print_true:
+        print('Total number of data points : ', len(df))
+        print('Length of one row of pixels, horizontal side of the grid: ', N)
 
     return df
+
+def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+    """
+    input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
+    output: adjusted Pandas.DataFrame
+    This function adds the driver as a feature on the second last location """
+
+    # In case this is not yet loaded
+    import pandas as pd
+
+    df = df
+    name = driver_name
+    row, col = df.shape
+
+    if not multiplesteps:
+        # print('check')
+        # Remove last timestep
+        driver = driver[:(-horizontal_pixels*vertical_pixels)]
+
+
+    # Insert driver on second last location (before the labels)
+    secondlast = col-1
+    df.insert(secondlast, name, driver)
+    if print_true:
+        print('Added ', name)
+    return df
+
+
+
+
