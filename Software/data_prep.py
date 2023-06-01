@@ -89,5 +89,30 @@ def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixel
     return df
 
 
+def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+    """
+    input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
+    output: adjusted Pandas.DataFrame
+    This function adds the driver as a feature on the second last location """
+
+    # In case this is not yet loaded
+    import pandas as pd
+
+    df = df
+    name = variable_rate_name
+    row, col = df.shape
 
 
+
+    # Insert driver on second last location (before the labels)
+    secondlast = col-1
+    df.insert(secondlast, name, variable_rate)
+    if print_true:
+        print('Added ', name)
+
+    if not multiplesteps:
+        # print('check')
+        # Remove last timestep
+        df = df[:(-horizontal_pixels*vertical_pixels)]
+        
+    return df

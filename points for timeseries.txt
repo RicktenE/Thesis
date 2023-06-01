@@ -1,5 +1,5 @@
 points for timeseries:
-[5, 20]-- Grow-- array location: 139
-[9,22] --Oscillation-- array location: 261
-[25,6] -- Grow-- array location: 725               optional: [25,8] [25,25]
-[29,24] -- Oscillation -- array location: 863
+[5, 20] -- Grow--                array location: 139
+[9,22]  -- Oscillation--          array location: 261
+[25,6]  -- Grow--                array location: 725               optional: [25,8] [25,25]
+[29,24] -- Oscillation --       array location: 863

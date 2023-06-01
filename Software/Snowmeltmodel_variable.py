@@ -27,7 +27,10 @@ class MyFirstModel(DynamicModel):
         self.snow = 0.0
         elevationMeteoStation = 2058.1
         elevationAboveMeteoStation = dem - elevationMeteoStation
-        temperatureLapseRate = 0.005
+
+        global rate
+        temperatureLapseRate = rate
+        print(' \n Temperature lapse rate is: ', temperatureLapseRate, '\n')
         self.temperatureCorrection = elevationAboveMeteoStation * temperatureLapseRate
 
         # ----------------------------------------------------------------------------#
@@ -60,7 +63,7 @@ class MyFirstModel(DynamicModel):
         snowFall = ifthenelse(freezing, precipitation, 0.0)
         rainFall = ifthenelse(pcrnot(freezing), precipitation, 0.0)
 
-        # Calculate snow -- Add fallen snow substract melted
+        # Calculate snow -- Add fallen snow subtract melted
         self.snow = self.snow + snowFall
         potentialMelt = ifthenelse(pcrnot(freezing), temperature * 0.01, 0)
         actualMelt = min(self.snow, potentialMelt)
@@ -72,15 +75,15 @@ class MyFirstModel(DynamicModel):
         # ----------------------------------------------------------------------------#
         # Report dynamic variables to maps
         # ----------------------------------------------------------------------------#
-        self.report(temperatureObserved, 'tempObs')
-        self.report(temperature, 'temp')
-        self.report(freezing, 'fr')
-        self.report(snowFall, 'snF')
-        self.report(rainFall, 'rF')
-        self.report(potentialMelt, 'pmelt')
-        self.report(actualMelt, 'amelt')
-        self.report(self.snow, 'snow')
-        self.report(runoffGenerated, 'rg')
+        # self.report(temperatureObserved, 'tempObs')
+        # self.report(temperature, 'temp')
+        # self.report(freezing, 'fr')
+        # self.report(snowFall, 'snF')
+        # self.report(rainFall, 'rF')
+        # self.report(potentialMelt, 'pmelt')
+        # self.report(actualMelt, 'amelt')
+        # self.report(self.snow, 'snow')
+        # self.report(runoffGenerated, 'rg')
 
         # ----------------------------------------------------------------------------#
         # Prepare dynamic drivers for ML read-out
@@ -131,6 +134,13 @@ class MyFirstModel(DynamicModel):
 
 nrOfTimeSteps = 181
 timesteps = nrOfTimeSteps
-myModel = MyFirstModel()
-dynamicModel = DynamicFramework(myModel, nrOfTimeSteps)
-dynamicModel.run()
+
+# elevationMeteoStation = [2010, 2050, 2070]
+temprate = [0.001, 0.002, 0.008, 0.01, 0.005]
+variable_list = temprate
+
+for iii in range(len(variable_list)):
+    rate = temprate[iii]
+    myModel = MyFirstModel()
+    dynamicModel = DynamicFramework(myModel, nrOfTimeSteps)
+    dynamicModel.run()
