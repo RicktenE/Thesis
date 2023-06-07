@@ -136,7 +136,11 @@ nrOfTimeSteps = 181
 timesteps = nrOfTimeSteps
 
 # elevationMeteoStation = [2010, 2050, 2070]
-temprate = [0.001, 0.002, 0.008, 0.01, 0.005]
+temprate = [0.002, 0.003, 0.004, 0.005, 0.001]
+# temprate = [0.001, 0.003, 0.004, 0.005, 0.002]
+# temprate = [0.001, 0.002, 0.004, 0.005, 0.003]
+# temprate = [0.001, 0.002, 0.003, 0.005, 0.004]
+# temprate = [0.001, 0.002, 0.003, 0.004, 0.005]
 variable_list = temprate
 
 for iii in range(len(variable_list)):
