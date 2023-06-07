@@ -116,3 +116,52 @@ def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_p
         df = df[:(-horizontal_pixels*vertical_pixels)]
         
     return df
+
+def animate_data(data, steps, animation_name):
+    '''Animation name must be a string ending in .mp4.
+    Data is the data you want to emulate. Must be in form of a dataframe with rows of horizontal pixels
+     columns of vertical pixels
+     and the next timestep appended below the df.  '''
+    import imageio.v2 as imageio
+
+
+    def save_plot_predict_rf(first_row, last_row, data, timestep):
+        #subset the correct data
+        data = data.iloc[first_row:last_row,:]
+
+        #import libraries needed
+        import matplotlib.pyplot as plt
+        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
+        # Create figure for animation
+        fig, ax = plt.subplots(figsize=(5,5))
+        divider = make_axes_locatable(ax)
+        cax = divider.append_axes('right', size='5%', pad=0.05)
+        cmap = cm.gist_yarg
+        im = ax.imshow(data, interpolation='nearest', cmap=cmap, vmin=0, vmax=0.275)
+        ax.set_title('MSE timestep %i' %timestep)
+        fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both', ticks= [0.05,0.1,0.15,0.2,0.25])
+
+        #save figure for animation
+        plt.plot()
+        plt.savefig(f'solution-{timestep}.png')
+        plt.close()
+
+    # last_row = 0
+    first_row = 0
+
+    # Create plots of simulation
+    for timestep in range(steps):
+        # timestep is 0,1,2,3,4,5...
+        # first rows is 0+niks, 1+ last_row
+
+        last_row = first_row + vertical_pixels
+        save_plot_predict_rf(first_row = first_row, last_row= last_row, data=data, timestep= timestep)
+        first_row = last_row
+
+    with imageio.get_writer(animation_name, format='FFMPEG', mode='I', fps=3) as writer:
+        for i in range(steps):
+            image = imageio.imread(f'solution-{i}.png')
+            writer.append_data(image)
+
+
