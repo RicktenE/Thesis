@@ -138,6 +138,7 @@ def animate_data(data, steps, animation_name):
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='5%', pad=0.05)
         cmap = cm.gist_yarg
+        # these outer values ( vmin, vmax) are set because otherwise the colorbar keeps shifting values with each new image in the animation
         im = ax.imshow(data, interpolation='nearest', cmap=cmap, vmin=0, vmax=0.275)
         ax.set_title('MSE timestep %i' %timestep)
         fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both', ticks= [0.05,0.1,0.15,0.2,0.25])
