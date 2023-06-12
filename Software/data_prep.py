@@ -1,5 +1,38 @@
 import pandas as pd
 
+def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
+    """
+    input: ndarray containing data
+    input: Number of pixels of simulation.
+    This function takes a flattened grid of pixels as input.
+        When used for simulation models, the different timesteps are
+        ammended below the previous timestep. This way each pixel has
+        one row for each timestep. top nxm rows are timestep 1, last nxm
+        rows are the last timestep. """
+
+    import pandas as pd
+
+    # get the length of one row of pixels
+    N = horizontal_pixels
+
+    df = pd.DataFrame()
+
+    # structure the timesteps
+    df["x_input"] = pd.DataFrame(data)
+
+    #Set results of timestep as label for previous timestep
+    df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
+
+    if not multiplesteps:
+        #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
+        #This result is the last
+        df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
+
+    if print_true:
+        print('Total number of data points : ', len(df))
+        print('Length of one row of pixels, horizontal side of the grid: ', N)
+
+    return df
 
 def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
     """
@@ -117,21 +150,24 @@ def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_p
         
     return df
 
-def animate_data(data, steps, animation_name):
+def animate_data(data, steps, animation_name, vertical_pixels):
     '''Animation name must be a string ending in .mp4.
     Data is the data you want to emulate. Must be in form of a dataframe with rows of horizontal pixels
      columns of vertical pixels
      and the next timestep appended below the df.  '''
+
+    # import libraries needed
+    import matplotlib.pyplot as plt
+    from mpl_toolkits.axes_grid1 import make_axes_locatable
     import imageio.v2 as imageio
+    import matplotlib.cm as cm
 
 
     def save_plot_predict_rf(first_row, last_row, data, timestep):
         #subset the correct data
         data = data.iloc[first_row:last_row,:]
 
-        #import libraries needed
-        import matplotlib.pyplot as plt
-        from mpl_toolkits.axes_grid1 import make_axes_locatable
+
 
         # Create figure for animation
         fig, ax = plt.subplots(figsize=(5,5))
