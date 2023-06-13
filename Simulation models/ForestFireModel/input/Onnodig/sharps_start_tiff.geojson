@@ -1,8 +1,0 @@
-{
-"type": "FeatureCollection",
-"name": "sharps_start_tiff",
-"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
-"features": [
-{ "type": "Feature", "properties": { "Event_ID": "ID4346711414520180729", "irwinID": "C6F83B30-CD6C-44F7-8977-20964A9D8591", "Incid_Name": "SHARPS", "Incid_Type": "Wildfire", "Map_ID": 10011311, "Map_Prog": "MTBS", "Asmnt_Type": "Initial", "BurnBndAc": 63895, "BurnBndLat": "43.532", "BurnBndLon": "-114.047", "Ig_Date": "2018-07-29", "Pre_ID": "804003020170805", "Post_ID": "804003020180824", "Perim_ID": null, "dNBR_offst": 6, "dNBR_stdDv": 38, "NoData_T": -970, "IncGreen_T": -150, "Low_T": 70, "Mod_T": 330, "High_T": 510, "Comment": null, "ORIG_FID": 27593 }, "geometry": { "type": "Point", "coordinates": [ -114.059229974353855, 43.538833068959136 ] } }
-]
-}
