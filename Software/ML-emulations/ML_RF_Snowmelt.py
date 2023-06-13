@@ -415,45 +415,45 @@ else:
     plt.show()
     plt.close()
 
-    # Autocorrelation plot for pattern evaluation
-    fig, (ax1, ax2, ax3, ax4)= plt.subplots(4, 1, figsize=(15,15))
-    fig.suptitle('Autocorrelation of simulation and emulation on several points', fontsize=18)
-
-    #---- point 1
-    ax1.acorr(point_1, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    ax1.acorr(point_1_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-
-    #---- point 2
-    ax2.acorr(point_2, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    ax2.acorr(point_2_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-
-    #---- point 3
-    ax3.acorr(point_3, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    ax3.acorr(point_3_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-
-    #---- point 4
-    ax4.acorr(point_4, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    ax4.acorr(point_4_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-
-    ax1.set_title('First Point', fontsize = 14)
-    ax2.set_title('Second Point', fontsize = 14)
-    ax3.set_title('Third Point', fontsize = 14)
-    ax4.set_title('Fourth Point', fontsize = 14)
-
-
-    ax1.legend(['target', 'predicted'] )
-    ax2.legend(['target', 'predicted'])
-    ax3.legend(['target', 'predicted'])
-    ax4.legend(['target', 'predicted'])
-
-
-
-    # fig.tight_layout()
-    # plt.subplot_tool()
-    plt.plot()
-    plt.savefig(f'Results/_rate{list_of_variables_for_simulation[-1]}_autocorrelation.png')
-    plt.show()
-    plt.close()
+    # # Autocorrelation plot for pattern evaluation
+    # fig, (ax1, ax2, ax3, ax4)= plt.subplots(4, 1, figsize=(15,15))
+    # fig.suptitle('Autocorrelation of simulation and emulation on several points', fontsize=18)
+    #
+    # #---- point 1
+    # ax1.acorr(point_1, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
+    # ax1.acorr(point_1_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
+    #
+    # #---- point 2
+    # ax2.acorr(point_2, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
+    # ax2.acorr(point_2_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
+    #
+    # #---- point 3
+    # ax3.acorr(point_3, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
+    # ax3.acorr(point_3_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
+    #
+    # #---- point 4
+    # ax4.acorr(point_4, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
+    # ax4.acorr(point_4_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
+    #
+    # ax1.set_title('First Point', fontsize = 14)
+    # ax2.set_title('Second Point', fontsize = 14)
+    # ax3.set_title('Third Point', fontsize = 14)
+    # ax4.set_title('Fourth Point', fontsize = 14)
+    #
+    #
+    # ax1.legend(['target', 'predicted'] )
+    # ax2.legend(['target', 'predicted'])
+    # ax3.legend(['target', 'predicted'])
+    # ax4.legend(['target', 'predicted'])
+    #
+    #
+    #
+    # # fig.tight_layout()
+    # # plt.subplot_tool()
+    # plt.plot()
+    # plt.savefig(f'Results/_rate{list_of_variables_for_simulation[-1]}_autocorrelation.png')
+    # plt.show()
+    # plt.close()
 
     elapsed_time = time.time() - start_time_total
 
