@@ -1,6 +1,7 @@
 import pandas as pd
 
-def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
+
+def only_y_label(data, all_pixels_of_map, print_true=True, multiplesteps=True):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -12,21 +13,18 @@ def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, mult
 
     import pandas as pd
 
-    # get the length of one row of pixels
-    N = horizontal_pixels
-
     df = pd.DataFrame()
 
     # structure the timesteps
     df["x_input"] = pd.DataFrame(data)
 
-    #Set results of timestep as label for previous timestep
-    df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
+    # Set results of timestep as label for previous timestep
+    df["y_label"] = df["x_input"].shift(-(all_pixels_of_map))
 
     if not multiplesteps:
-        #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
-        #This result is the last
-        df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
+        # Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
+        # This result is the last
+        df = df.iloc[:-(all_pixels_of_map)]
 
     if print_true:
         print('Total number of data points : ', len(df))
@@ -34,7 +32,8 @@ def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, mult
 
     return df
 
-def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
+
+def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps=True):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -79,15 +78,13 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=Tr
     df["bottom_left"] = df["x_input"].shift(N - 1)
     df["bottom_left"].iloc[:(N - 1)] = df["x_input"].iloc[:(N - 1)]  # fix nans
 
-    #Set results of timestep as label for previous timestep
-    df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
-
-
+    # Set results of timestep as label for previous timestep
+    df["y_label"] = df["x_input"].shift(-(horizontal_pixels * vertical_pixels))
 
     if not multiplesteps:
-        #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
-        #This result is the last
-        df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
+        # Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
+        # This result is the last
+        df = df.iloc[:-(horizontal_pixels * vertical_pixels)]
 
     if print_true:
         print('Total number of data points : ', len(df))
@@ -95,7 +92,8 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=Tr
 
     return df
 
-def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+
+def driver_as_feature(df, driver, driver_name, all_pixels_of_map, multiplesteps=True, print_true=False):
     """
     input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
     output: adjusted Pandas.DataFrame
@@ -111,17 +109,18 @@ def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixel
     if not multiplesteps:
         # print('check')
         # Remove last timestep
-        driver = driver[:(-horizontal_pixels*vertical_pixels)]
-
+        driver = driver[:(-all_pixels_of_map)]
 
     # Insert driver on second last location (before the labels)
-    secondlast = col-1
+    secondlast = col - 1
     df.insert(secondlast, name, driver)
     if print_true:
         print('Added ', name)
     return df
 
-def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+
+def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, all_pixels_of_map, multiplesteps=True,
+                             print_true=False):
     """
     input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
     output: adjusted Pandas.DataFrame
@@ -134,10 +133,8 @@ def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_p
     name = variable_rate_name
     row, col = df.shape
 
-
-
     # Insert driver on second last location (before the labels)
-    secondlast = col-1
+    secondlast = col - 1
     df.insert(secondlast, name, variable_rate)
     if print_true:
         print('Added ', name)
@@ -145,9 +142,10 @@ def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_p
     if not multiplesteps:
         # print('check')
         # Remove last timestep
-        df = df[:(-horizontal_pixels*vertical_pixels)]
-        
+        df = df[:(-all_pixels_of_map)]
+
     return df
+
 
 def animate_data(data, steps, animation_name, vertical_pixels):
     '''Animation name must be a string ending in .mp4.
@@ -161,24 +159,21 @@ def animate_data(data, steps, animation_name, vertical_pixels):
     import imageio.v2 as imageio
     import matplotlib.cm as cm
 
-
     def save_plot_predict_rf(first_row, last_row, data, timestep):
-        #subset the correct data
-        data = data.iloc[first_row:last_row,:]
-
-
+        # subset the correct data
+        data = data.iloc[first_row:last_row, :]
 
         # Create figure for animation
-        fig, ax = plt.subplots(figsize=(5,5))
+        fig, ax = plt.subplots(figsize=(5, 5))
         divider = make_axes_locatable(ax)
         cax = divider.append_axes('right', size='5%', pad=0.05)
         cmap = cm.gist_yarg
         # these outer values ( vmin, vmax) are set because otherwise the colorbar keeps shifting values with each new image in the animation
         im = ax.imshow(data, interpolation='nearest', cmap=cmap, vmin=0, vmax=0.275)
-        ax.set_title('MSE timestep %i' %timestep)
-        fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both', ticks= [0.05,0.1,0.15,0.2,0.25])
+        ax.set_title('MSE timestep %i' % timestep)
+        fig.colorbar(im, cax=cax, orientation='vertical', extend='both', ticks=[0.05, 0.1, 0.15, 0.2, 0.25])
 
-        #save figure for animation
+        # save figure for animation
         plt.plot()
         plt.savefig(f'solution-{timestep}.png')
         plt.close()
@@ -192,7 +187,7 @@ def animate_data(data, steps, animation_name, vertical_pixels):
         # first rows is 0+niks, 1+ last_row
 
         last_row = first_row + vertical_pixels
-        save_plot_predict_rf(first_row = first_row, last_row= last_row, data=data, timestep= timestep)
+        save_plot_predict_rf(first_row=first_row, last_row=last_row, data=data, timestep=timestep)
         first_row = last_row
 
     with imageio.get_writer(animation_name, format='FFMPEG', mode='I', fps=3) as writer:

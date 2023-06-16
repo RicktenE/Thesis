@@ -1,6 +1,6 @@
 import pandas as pd
 
-def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, multiplesteps = True):
+def only_y_label(data, all_pixels_of_map, print_true=True, multiplesteps = True):
     """
     input: ndarray containing data
     input: Number of pixels of simulation.
@@ -12,21 +12,18 @@ def only_y_label(data, horizontal_pixels, vertical_pixels, print_true=True, mult
 
     import pandas as pd
 
-    # get the length of one row of pixels
-    N = horizontal_pixels
-
     df = pd.DataFrame()
 
     # structure the timesteps
     df["x_input"] = pd.DataFrame(data)
 
     #Set results of timestep as label for previous timestep
-    df["y_label"] = df["x_input"].shift(-(horizontal_pixels*vertical_pixels))
+    df["y_label"] = df["x_input"].shift(-(all_pixels_of_map))
 
     if not multiplesteps:
         #Remove the last timestep to avoid NaNs in label. The last simulated step does not have a new result. It is the last result
         #This result is the last
-        df = df.iloc[:-(horizontal_pixels*vertical_pixels)]
+        df = df.iloc[:-(all_pixels_of_map)]
 
     if print_true:
         print('Total number of data points : ', len(df))
@@ -95,7 +92,7 @@ def neighbour_as_feature(data, horizontal_pixels, vertical_pixels, print_true=Tr
 
     return df
 
-def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+def driver_as_feature(df, driver, driver_name, all_pixels_of_map, multiplesteps = True, print_true = False):
     """
     input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
     output: adjusted Pandas.DataFrame
@@ -111,7 +108,7 @@ def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixel
     if not multiplesteps:
         # print('check')
         # Remove last timestep
-        driver = driver[:(-horizontal_pixels*vertical_pixels)]
+        driver = driver[:(-all_pixels_of_map)]
 
 
     # Insert driver on second last location (before the labels)
@@ -121,7 +118,7 @@ def driver_as_feature(df, driver, driver_name, horizontal_pixels, vertical_pixel
         print('Added ', name)
     return df
 
-def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_pixels, vertical_pixels, multiplesteps = True, print_true = False):
+def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, all_pixels_of_map, multiplesteps = True, print_true = False):
     """
     input: data: Pandas.DataFrame, driver:np.array.flattened(), horizontal_pixels: int,vertical_pixels: int.
     output: adjusted Pandas.DataFrame
@@ -145,7 +142,7 @@ def VARIABLE_rate_as_feature(df, variable_rate, variable_rate_name, horizontal_p
     if not multiplesteps:
         # print('check')
         # Remove last timestep
-        df = df[:(-horizontal_pixels*vertical_pixels)]
+        df = df[:(-all_pixels_of_map)]
         
     return df
 

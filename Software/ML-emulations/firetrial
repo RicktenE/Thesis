@@ -1,0 +1,41 @@
+# Data handling
+import pandas as pd
+import numpy as np
+import data_prep  #! make sure that the files are in the same folder
+
+# check computation time
+import time
+
+# Modelling
+from sklearn.ensemble import RandomForestRegressor
+
+# Feature importance
+from sklearn.inspection import permutation_importance
+
+# Hyper parameter tuning
+from sklearn.model_selection import RandomizedSearchCV
+
+# Performance measures
+from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, mean_absolute_error, explained_variance_score,max_error
+
+
+# Tree Visualisation
+import os
+from sklearn.tree import export_graphviz
+
+from subprocess import call
+from IPython.display import Image
+
+# Prediction visualisation
+from mpl_toolkits.axes_grid1 import make_axes_locatable
+import matplotlib.pyplot as plt
+import matplotlib.cm as cm # Has to be last due to overlapping functions from other packages
+
+start_time_total = time.time()
+start_time = time.time()
+# Run the model
+import fire
+
+elapsed_time = time.time() - start_time
+
+print(f"\n Elapsed time to run simulation model: {elapsed_time:.3f} seconds")

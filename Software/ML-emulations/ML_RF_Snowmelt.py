@@ -190,7 +190,7 @@ if optimise_model_true:
 else:
     # fit the model
     start_time_fitting = time.time()
-    rf = RandomForestRegressor(n_estimators=10,
+    rf = RandomForestRegressor(n_estimators=15,
                                min_samples_split=4,
                                min_samples_leaf=8,
                                max_features=1.0,
@@ -310,7 +310,7 @@ else:
     fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both')#, ticks= [0.05,0.1,0.15,0.2,0.25])
 
     plt.plot()
-    plt.savefig(f'Results/_rate{list_of_variables_for_simulation[-1]}_MSE_map.png')
+    plt.savefig(f'Results/focussed_4_training_rate{list_of_variables_for_simulation[-1]}_MSE_map.png')
     plt.show()
     plt.close()
 
@@ -385,6 +385,12 @@ else:
     ax4.plot(range(plot_xvalues), point_4, '.-', color = 'green', linewidth= 2)
     ax4.plot(range(plot_xvalues), point_4_pred, '.-', color = 'blue', linewidth= 1.0)
 
+    ax1.grid()
+    ax2.grid()
+    ax3.grid()
+    ax4.grid()
+
+
     ax1.set_title('First Point', fontsize = 14)
     ax1.set_ylabel('Snowfall [m]')
     ax1.set_xlabel('Timestep [day]')
@@ -398,20 +404,17 @@ else:
     ax4.set_ylabel('Snowfall [m]')
     ax4.set_xlabel('Timestep [day]')
 
+
     ax1.legend(['target', 'predicted'])
     ax2.legend(['target', 'predicted'])
     ax3.legend(['target', 'predicted'])
     ax4.legend(['target', 'predicted'])
 
-    ax1.grid()
-    ax2.grid()
-    ax3.grid()
-    ax4.grid()
 
     fig.tight_layout()
     # plt.subplot_tool()
     plt.plot()
-    plt.savefig(f'Results/_rate{list_of_variables_for_simulation[-1]}_timeseries.png')
+    plt.savefig(f'Results/focussed4training_rate{list_of_variables_for_simulation[-1]}_timeseries.png')
     plt.show()
     plt.close()
 
@@ -451,7 +454,7 @@ else:
     # # fig.tight_layout()
     # # plt.subplot_tool()
     # plt.plot()
-    # plt.savefig(f'Results/_rate{list_of_variables_for_simulation[-1]}_autocorrelation.png')
+    # plt.savefig(f'Results/focussed4training_rate{list_of_variables_for_simulation[-1]}_autocorrelation.png')
     # plt.show()
     # plt.close()
 

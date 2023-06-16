@@ -4,6 +4,7 @@ import numpy as np
 
 #Initialise variables for later use
 fire_array = np.empty(0)
+Area_fire_array = np.empty(0)
 # precipitation_array = np.empty(0)
 dem_array = np.empty(0)
 # temp_array = np.empty(0)
@@ -67,7 +68,9 @@ class Fire(DynamicModel):
         angle = atan(((scalar(boolean(F_neighbor_elevation)) * PNF_elevation) - F_neighbor_elevation)*(-1))
 
       angle_trans = ifthenelse(scalar(angle) > 180, scalar(angle) - 360, scalar(angle))
-      prob_elev = 0.001*m.e ** (0.05 * scalar(angle_trans)) * scalar(boolean(F_neighbor_elevation))
+      prob_elev = 0.1*m.e ** (0.05 * scalar(angle_trans)) * scalar(boolean(F_neighbor_elevation))
+      # prob_elev = 1*m.e ** (0.05 * scalar(angle_trans)) * scalar(boolean(F_neighbor_elevation))
+
       return prob_elev
 
     p_NW = elevation_probability(self.fire,  True, [1, 1] , fire_elevation, PNF_elevation)
@@ -101,7 +104,16 @@ class Fire(DynamicModel):
     #just a check to see if it works properly
     # print('        ')
     # print(array_for_ml)
+    self.purefire = ifthenelse(self.fire==1, self.fire, np.nan)
 
+    # self.Area_fire = areaarea(ordinal(self.purefire))
+    self.firemap_array = pcr2numpy(self.purefire, np.nan)
+    self.firearea_array_flat = self.firemap_array.flatten()
+    x = self.firearea_array_flat
+    x = x[~numpy.isnan(x)]
+    self.count_fire_pixels = len(x)
+    global Area_fire_array
+    Area_fire_array = np.append(Area_fire_array, self.count_fire_pixels)
 
     #update fire status
     self.fire = (self.fire + scalar(NewFire))
@@ -110,7 +122,7 @@ class Fire(DynamicModel):
 
 
 
-nrOfTimeSteps=100
+nrOfTimeSteps=50
 timesteps = nrOfTimeSteps
 myModel = Fire()
 dynamicModel = DynamicFramework(myModel,nrOfTimeSteps)
