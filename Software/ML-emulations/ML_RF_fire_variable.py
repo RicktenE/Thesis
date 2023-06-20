@@ -206,7 +206,7 @@ else:
     # fit the model
     start_time_fitting = time.time()
     rf = RandomForestClassifier(n_estimators=10,
-                               max_depth=15,
+                               max_depth=10,
                                verbose = True)
     rf.fit(X_train, y_train)
     elapsed_time = time.time() - start_time_fitting
@@ -337,29 +337,29 @@ else:
     plot_xvalues = timesteps-2
 
     fig, ax = plt.subplots(1, 1, figsize=(15,15))
-    fig.suptitle('Area increase of forest fire', fontsize=28)
+    fig.suptitle('         Area of fire', fontsize=46)
 
     #---- point 1
-    ax.plot(range(plot_xvalues), areafire[:plot_xvalues], '.-', color = 'green', linewidth= 2)
-    ax.plot(range(plot_xvalues), array_area_pred[:plot_xvalues], '.-', color = 'red', linewidth= 1.0)
+    ax.plot(range(plot_xvalues), areafire[:plot_xvalues], 'x-', color = 'green', linewidth= 2)
+    ax.plot(range(plot_xvalues), array_area_pred[:plot_xvalues], 'o-', color = 'blue', linewidth= 1.0)
 
-    ax.set_title(f'Alpha = {fire_variable.alpha}, R = {fire_variable.R_[-1]}', fontsize = 24)
-    ax.set_ylabel(' Area of fire [pixels]', fontsize = 24)
-    ax.set_xlabel(' timesteps of simulation', fontsize = 24)
-    ax.legend(['target', 'predicted'],fontsize= 24)
-    plt.yticks(fontsize=20)
-    plt.xticks(fontsize=20)
+    ax.set_title(f'Alpha = {fire_variable.alpha[-1]}, R = {fire_variable.R_[-1]}', fontsize = 44)
+    ax.set_ylabel(' Area of fire [pixels]', fontsize = 40)
+    ax.set_xlabel('timesteps of simulation', fontsize = 40)
+    ax.legend(['target', 'predicted'],fontsize= 36)
+    plt.yticks(fontsize=32)
+    plt.xticks(fontsize=32)
     ax.grid()
 
 
     fig.tight_layout()
     # plt.subplot_tool()
     plt.plot()
-    # plt.savefig(f'Results/EXTRAPOLATED_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
-    # plt.savefig(f'Results/INTERPOLATED_wide_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+    # plt.savefig(f'Results/EXTRAPOLATED_R_alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+    plt.savefig(f'Results/INTERPOLATED_alpha__a_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
     # plt.savefig(f'Results/NONEIGHBOUR_interpolated_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
     # plt.savefig(f'Results/Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
-    plt.savefig(f'Results/EXTREME_Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
+    # plt.savefig(f'Results/INCL_DRIVERS_Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
     plt.show()
     plt.close()
 

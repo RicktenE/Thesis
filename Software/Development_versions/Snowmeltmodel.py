@@ -72,15 +72,15 @@ class MyFirstModel(DynamicModel):
         # ----------------------------------------------------------------------------#
         # Report dynamic variables to maps
         # ----------------------------------------------------------------------------#
-        self.report(temperatureObserved, 'tempObs')
-        self.report(temperature, 'temp')
-        self.report(freezing, 'fr')
-        self.report(snowFall, 'snF')
-        self.report(rainFall, 'rF')
-        self.report(potentialMelt, 'pmelt')
-        self.report(actualMelt, 'amelt')
-        self.report(self.snow, 'snow')
-        self.report(runoffGenerated, 'rg')
+        # self.report(temperatureObserved, 'tempObs')
+        # self.report(temperature, 'temp')
+        # self.report(freezing, 'fr')
+        # self.report(snowFall, 'snF')
+        # self.report(rainFall, 'rF')
+        # self.report(potentialMelt, 'pmelt')
+        # self.report(actualMelt, 'amelt')
+        # self.report(self.snow, 'snow')
+        # self.report(runoffGenerated, 'rg')
 
         # ----------------------------------------------------------------------------#
         # Prepare dynamic drivers for ML read-out
@@ -129,7 +129,7 @@ class MyFirstModel(DynamicModel):
         # ----------------------------------------------------------------------------#
 
 
-nrOfTimeSteps = 181
+nrOfTimeSteps = 148
 timesteps = nrOfTimeSteps
 myModel = MyFirstModel()
 dynamicModel = DynamicFramework(myModel, nrOfTimeSteps)

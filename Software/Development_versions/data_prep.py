@@ -27,7 +27,7 @@ def only_y_label(data, all_pixels_of_map, print_true=True, multiplesteps = True)
 
     if print_true:
         print('Total number of data points : ', len(df))
-        print('Length of one row of pixels, horizontal side of the grid: ', N)
+        # print('Length of one row of pixels, horizontal side of the grid: ', N)
 
     return df
 

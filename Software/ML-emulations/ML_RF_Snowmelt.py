@@ -6,7 +6,7 @@ import time
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import RandomizedSearchCV, train_test_split
-import data_prep
+import data_prep_snow
 import matplotlib.cm as cm
 import matplotlib.pyplot as plt
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -52,11 +52,11 @@ list_driver_names = ['precipitation','temp', 'dem']
 
 dfs = [None] * number_of_training_simulations
 length_one_simulation = timesteps*vertical_pixels*horizontal_pixels
-# Add drivers as features
+# # Add drivers as features
 for iiii in range(number_of_training_simulations):
     print(iiii)
 
-    dfs[iiii] = data_prep.only_y_label(data=list_data[iiii],
+    dfs[iiii] = data_prep_snow.only_y_label(data=list_data[iiii],
                                                horizontal_pixels=horizontal_pixels,
                                                vertical_pixels=vertical_pixels,
                                                multiplesteps =False)
@@ -69,14 +69,14 @@ for iiii in range(number_of_training_simulations):
         name = list_driver_names[_]
 
         # Add driver at each timestep and each pixel to the dataframe
-        dfs[iiii] = data_prep.driver_as_feature(df=dfs[iiii],
+        dfs[iiii] = data_prep_snow.driver_as_feature(df=dfs[iiii],
                                          driver=driver, driver_name=name,
                                          horizontal_pixels=horizontal_pixels,
                                          vertical_pixels=vertical_pixels,
                                          multiplesteps=False)
 
     # Add variable rate as feature
-    dfs[iiii] = data_prep.VARIABLE_rate_as_feature(df= dfs[iiii],
+    dfs[iiii] = data_prep_snow.VARIABLE_rate_as_feature(df= dfs[iiii],
                                                    variable_rate=list_of_variables_for_simulation[iiii],
                                                    variable_rate_name='TEMP_rate',
                                                    horizontal_pixels=horizontal_pixels,
@@ -190,11 +190,11 @@ if optimise_model_true:
 else:
     # fit the model
     start_time_fitting = time.time()
-    rf = RandomForestRegressor(n_estimators=15,
+    rf = RandomForestRegressor(n_estimators=10,
                                min_samples_split=4,
                                min_samples_leaf=8,
-                               max_features=1.0,
-                               max_depth=40,
+                               max_features='sqrt',
+                               max_depth=10,
                                bootstrap=True)
     rf.fit(X_train, y_train)
     elapsed_time = time.time() - start_time_fitting
@@ -237,7 +237,7 @@ else:
         array_predictions = np.append(array_predictions, y_pred_rf)
 
         # Create the new test set for next prediction
-        new_state = data_prep.only_y_label(y_pred_rf.reshape(-1,1),
+        new_state = data_prep_snow.only_y_label(y_pred_rf.reshape(-1,1),
                                                    horizontal_pixels,
                                                    vertical_pixels,
                                                    multiplesteps=True,
@@ -248,7 +248,7 @@ else:
         for __ in range(len(list_drivers_once)):
             driver = list_drivers_once[__]
             name = list_driver_names[__]
-            new_state = data_prep.driver_as_feature(df = new_state,
+            new_state = data_prep_snow.driver_as_feature(df = new_state,
                                                     driver=driver[first_pixel_driver:(last_pixel_driver)],
                                                     driver_name= name,
                                                     horizontal_pixels=horizontal_pixels,
@@ -256,7 +256,7 @@ else:
                                                     multiplesteps=True)
 
         # Add variable rate as feature
-        df = data_prep.VARIABLE_rate_as_feature(df = new_state,
+        df = data_prep_snow.VARIABLE_rate_as_feature(df = new_state,
                                                 variable_rate= list_of_variables_for_simulation[-1],
                                                 variable_rate_name = 'TEMP_rate',
                                                 horizontal_pixels=horizontal_pixels,
@@ -310,7 +310,7 @@ else:
     fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both')#, ticks= [0.05,0.1,0.15,0.2,0.25])
 
     plt.plot()
-    plt.savefig(f'Results/focussed_4_training_rate{list_of_variables_for_simulation[-1]}_MSE_map.png')
+    plt.savefig(f'Results/EXTRAPOLATE_MSE_{list_of_variables_for_simulation[-1]}_MSE_map.png')
     plt.show()
     plt.close()
 
@@ -414,7 +414,7 @@ else:
     fig.tight_layout()
     # plt.subplot_tool()
     plt.plot()
-    plt.savefig(f'Results/focussed4training_rate{list_of_variables_for_simulation[-1]}_timeseries.png')
+    plt.savefig(f'Results/EXTRAPOLATE_{list_of_variables_for_simulation[-1]}_timeseries.png')
     plt.show()
     plt.close()
 
