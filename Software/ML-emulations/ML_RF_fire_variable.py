@@ -24,6 +24,12 @@ from mpl_toolkits.axes_grid1 import make_axes_locatable
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm  # Has to be last due to overlapping functions from other packages
 
+
+# NN = True
+NN = False
+
+
+
 start_time_total = time.time()
 start_time = time.time()
 # Run the model
@@ -66,8 +72,11 @@ dem = np.repeat(dem, timesteps)
 list_data = np.array_split(data, number_of_training_simulations)
 list_dem = np.array_split(dem, number_of_training_simulations)
 list_neighbours = np.array_split(neighbours, number_of_training_simulations)
-list_driver_names = ['neighbours', 'dem']
-# list_driver_names = ['dem']
+if NN:
+    list_driver_names = ['dem']
+else:
+    list_driver_names = ['neighbours', 'dem']
+
 
 
 dfs = [None] * number_of_training_simulations
@@ -84,8 +93,12 @@ for iiii in range(number_of_training_simulations):
                                                 multiplesteps =False,
                                                 print_true= False)
 
-    list_drivers = [list_neighbours[iiii], list_dem[iiii]]
-    # list_drivers = [list_dem[iiii]]
+    if NN:
+        list_drivers = [list_dem[iiii]]
+    else:
+        list_drivers = [list_neighbours[iiii], list_dem[iiii]]
+
+    #
      # Add drivers at each timestep and each pixel to the dataframe
     for _ in range(len(list_drivers)):
         driver = list_drivers[_]
@@ -213,8 +226,11 @@ else:
     print(f"\n Elapsed time to fit the model: {elapsed_time:.3f} seconds")
 
   # Predict one complete simulation on unseen variable
-    list_drivers_once = [list_neighbours[-1], list_dem[-1]]
-    # list_drivers_once = [list_dem[-1]]
+    if NN:
+        list_drivers_once = [list_dem[-1]]
+    else:
+        list_drivers_once = [list_neighbours[-1], list_dem[-1]]
+
 
     # -1 timestep due to removed last timesteps to avoid NaN's in Labels
     steps = timesteps-1
@@ -355,11 +371,19 @@ else:
     fig.tight_layout()
     # plt.subplot_tool()
     plt.plot()
-    # plt.savefig(f'Results/EXTRAPOLATED_R_alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
-    plt.savefig(f'Results/INTERPOLATED_alpha__a_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
-    # plt.savefig(f'Results/NONEIGHBOUR_interpolated_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
-    # plt.savefig(f'Results/Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
-    # plt.savefig(f'Results/INCL_DRIVERS_Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
+    if NN:
+        plt.savefig(f'NewResults/NONEIGHBOUR_interpolated_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+    else:
+        # plt.savefig(f'NewResults/INCL_DRIVERS_Alpha_{fire_variable.alpha}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/EXTRAPOLATED_R___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/EXTRAPOLATED_alpha___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/INTERPOLATED_alpha__a_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/WIDE_R___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/WIDE_alpha___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        # plt.savefig(f'NewResults/Narrow_R___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+        plt.savefig(f'NewResults/Narrow_alpha___alpha_{fire_variable.alpha[-1]}_R_{fire_variable.R_[-1]}.png')
+
+
     plt.show()
     plt.close()
 

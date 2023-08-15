@@ -15,6 +15,13 @@ start_time = time.time()
 # Run the model
 import Snowmeltmodel_variable
 
+
+# if no drivers set NN = True
+# NN = True
+NN = False
+
+
+
 elapsed_time = time.time() - start_time
 
 print(f"\n Elapsed time to run simulation models: {elapsed_time:.3f} seconds")
@@ -48,7 +55,10 @@ list_precipitation = np.array_split(precipitation, number_of_training_simulation
 list_temp = np.array_split(temp, number_of_training_simulations)
 list_dem = np.array_split(dem, number_of_training_simulations)
 # create list of drivers and names
-list_driver_names = ['precipitation','temp', 'dem']
+if NN:
+    list_driver_names = ['dem']
+else:
+    list_driver_names = ['precipitation','temp', 'dem']
 
 dfs = [None] * number_of_training_simulations
 length_one_simulation = timesteps*vertical_pixels*horizontal_pixels
@@ -61,7 +71,10 @@ for iiii in range(number_of_training_simulations):
                                                vertical_pixels=vertical_pixels,
                                                multiplesteps =False)
 
-    list_drivers = [list_precipitation[iiii],list_temp[iiii], list_dem[iiii]]
+    if NN:
+        list_drivers = [list_dem[iiii]]
+    else:
+        list_drivers = [list_precipitation[iiii],list_temp[iiii], list_dem[iiii]]
 
      # Add drivers at each timestep and each pixel to the dataframe
     for _ in range(len(list_drivers)):
@@ -191,18 +204,17 @@ else:
     # fit the model
     start_time_fitting = time.time()
     rf = RandomForestRegressor(n_estimators=10,
-                               min_samples_split=4,
-                               min_samples_leaf=8,
-                               max_features='sqrt',
-                               max_depth=10,
+                               max_depth=15,
                                bootstrap=True)
     rf.fit(X_train, y_train)
     elapsed_time = time.time() - start_time_fitting
     print(f"\n Elapsed time to fit the model: {elapsed_time:.3f} seconds")
 
     # Predict one complete simulation on unseen variable
-    list_drivers_once = [list_precipitation[0],list_temp[0], list_dem[0]]
-
+    if NN:
+        list_drivers_once = [list_dem[0]]
+    else:
+        list_drivers_once = [list_precipitation[0],list_temp[0], list_dem[0]]
     # -1 timestep due to removed last timesteps to avoid NaN's in Labels
     steps = timesteps-1
 
@@ -215,6 +227,7 @@ else:
     X_test_multiple = X_train.iloc[:(horizontal_pixels*vertical_pixels),:]
 
     # - Make predictions
+    start_time_predictions = time.time()
     # - Save prediction
     # - Set prediction as new input
     #
@@ -266,6 +279,11 @@ else:
 
         # remove the Y_label-- y_label only used for training
         X_test_multiple = new_state.iloc[:, :-1]
+    # ___________________________________________________________________________
+    elapsed_time_predictions = time.time() - start_time_predictions
+
+    print(f"Elapsed time to predict all: {elapsed_time_predictions:.3f} seconds")
+    #___________________________________________________________________________
 
     # Generate results:
     # MSE_map: Mean of each pixel averaged over all timesteps
@@ -275,6 +293,7 @@ else:
     first_pixel_y_test = 0
     y_test = pd.Series(y_test)
     list_y_test_ = [None] * steps
+
 
     for _ in range(steps):
 
@@ -289,6 +308,7 @@ else:
 
         first_pixel_y_test = last_pixel_y_test
 
+
     squared_difference = [None] * steps
     test_concat = pd.DataFrame()
     for __ in range(steps):
@@ -301,18 +321,55 @@ else:
                  .unstack()
 
 
-    fig, ax = plt.subplots(figsize=(5,5))
+    # fig, ax = plt.subplots(figsize=(5,5))
+    # divider = make_axes_locatable(ax)
+    # cax = divider.append_axes('right', size='5%', pad=0.05)
+    # cmap = cm.coolwarm
+    # im = ax.imshow(MSE_map, interpolation='nearest', cmap=cmap, vmin=MSE_map.to_numpy().max(), vmax=MSE_map.to_numpy().min())
+    # ax.set_title(f'MSE distribution \n  temprate = {list_of_variables_for_simulation[-1]}')
+    # fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both')#, ticks= [0.05,0.1,0.15,0.2,0.25])
+    #
+    # plt.plot()
+    # plt.savefig(f'Results/EXTRAPOLATE_MSE_{list_of_variables_for_simulation[-1]}_MSE_map.png')
+    # plt.show()
+    # plt.close()
+
+    from matplotlib.ticker import FormatStrFormatter
+    titlesize = 40
+    subtitlesize = 18
+    xylabelsize = 28
+    xyticksize = 24
+    legendsize = 28
+
+    fig, ax = plt.subplots(figsize=(8.2,10))
+    fig.suptitle('MSE distribution', fontsize=titlesize)
+    ax.set_title(f'TLR = {list_of_variables_for_simulation[-1]}', fontsize = subtitlesize)
+    ax.tick_params(axis='x', labelsize=xyticksize)
+    ax.tick_params(axis='y', labelsize=xyticksize)
+
     divider = make_axes_locatable(ax)
     cax = divider.append_axes('right', size='5%', pad=0.05)
     cmap = cm.coolwarm
-    im = ax.imshow(MSE_map, interpolation='nearest', cmap=cmap, vmin=MSE_map.to_numpy().max(), vmax=MSE_map.to_numpy().min())
-    ax.set_title(f'MSE distribution \n  temprate = {list_of_variables_for_simulation[-1]}')
-    fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both')#, ticks= [0.05,0.1,0.15,0.2,0.25])
+    im = ax.imshow(MSE_map, interpolation='nearest', cmap=cmap, vmin = 0, vmax= 0.08)
 
+    cbar = fig.colorbar(im,cax=cax, orientation='vertical', extend = 'both',format ='%.2f', ticks= [0.01, 0.02, 0.03, 0.04, 0.05, 0.06, 0.07, 0.08])
+    cbar.ax.tick_params(labelsize=xyticksize)
+    fig.tight_layout()
     plt.plot()
-    plt.savefig(f'Results/EXTRAPOLATE_MSE_{list_of_variables_for_simulation[-1]}_MSE_map.png')
-    plt.show()
-    plt.close()
+    if NN:
+        plt.savefig(f'NewResults/MSE_no_driver_{list_of_variables_for_simulation[-1]}.png')
+        plt.show()
+        plt.close()
+    else:
+        # plt.savefig(f'NewResults/MSE_With_driver_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/MSE_EXTRAPOLATE_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/MSE_INTERPOLATE_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/MSE_WIDE_{list_of_variables_for_simulation[-1]}.png')
+        plt.savefig(f'NewResults/MSE_SHARP_{list_of_variables_for_simulation[-1]}.png')
+        plt.show()
+        plt.close()
+
+    print('check')
 
     # overall MSE/MAPE/MAE/Explained variance
     from sklearn.metrics import mean_squared_error, mean_absolute_percentage_error, mean_absolute_error, explained_variance_score,max_error
@@ -366,8 +423,11 @@ else:
         point_4_pred = np.append(point_4_pred, array_predictions[point_4_in_array])
 
 
+
+
+
     fig, (ax1, ax2, ax3, ax4)= plt.subplots(4, 1, figsize=(15,15))
-    fig.suptitle('Emulation performance on several points of the simulation', fontsize=18)
+    fig.suptitle('Amount of snow on four points of the simulation', fontsize=titlesize)
 
     #---- point 1
     ax1.plot(range(plot_xvalues), point_1, '.-', color = 'green', linewidth= 2)
@@ -385,78 +445,64 @@ else:
     ax4.plot(range(plot_xvalues), point_4, '.-', color = 'green', linewidth= 2)
     ax4.plot(range(plot_xvalues), point_4_pred, '.-', color = 'blue', linewidth= 1.0)
 
+    ax1.set_title('First Point', fontsize = subtitlesize)
+    ax2.set_title('Second Point', fontsize = subtitlesize)
+    ax3.set_title('Third Point', fontsize = subtitlesize)
+    ax4.set_title('Fourth Point', fontsize = subtitlesize)
+
+    ax1.tick_params(axis='x', labelsize=xyticksize)
+    ax1.tick_params(axis='y', labelsize=xyticksize)
+    ax2.tick_params(axis='x', labelsize=xyticksize)
+    ax2.tick_params(axis='y', labelsize=xyticksize)
+    ax3.tick_params(axis='x', labelsize=xyticksize)
+    ax3.tick_params(axis='y', labelsize=xyticksize)
+    ax4.tick_params(axis='x', labelsize=xyticksize)
+    ax4.tick_params(axis='y', labelsize=xyticksize)
+    ax1.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax2.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax3.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax4.yaxis.set_major_formatter(FormatStrFormatter('%.2f'))
+    ax1.set_ylabel('Snow [m]', fontsize = xylabelsize)
+    ax1.set_xlabel('Timestep [day]', fontsize = xylabelsize)
+
+    ax2.set_ylabel('Snow [m]', fontsize = xylabelsize)
+    ax2.set_xlabel('Timestep [day]', fontsize = xylabelsize)
+
+    ax3.set_ylabel('Snow [m]', fontsize = xylabelsize)
+    ax3.set_xlabel('Timestep [day]', fontsize = xylabelsize)
+
+    ax4.set_ylabel('Snow [m]', fontsize = xylabelsize)
+    ax4.set_xlabel('Timestep [day]', fontsize = xylabelsize)
+
+
+    ax1.legend(['target', 'predicted'],fontsize= legendsize)
+    ax2.legend(['target', 'predicted'],fontsize= legendsize)
+    ax3.legend(['target', 'predicted'],fontsize= legendsize)
+    ax4.legend(['target', 'predicted'],fontsize= legendsize)
+
+
     ax1.grid()
     ax2.grid()
     ax3.grid()
     ax4.grid()
 
-
-    ax1.set_title('First Point', fontsize = 14)
-    ax1.set_ylabel('Snowfall [m]')
-    ax1.set_xlabel('Timestep [day]')
-    ax2.set_title('Second Point', fontsize = 14)
-    ax2.set_ylabel('Snowfall [m]')
-    ax2.set_xlabel('Timestep [day]')
-    ax3.set_title('Third Point', fontsize = 14)
-    ax3.set_ylabel('Snowfall [m]')
-    ax3.set_xlabel('Timestep [day]')
-    ax4.set_title('Fourth Point', fontsize = 14)
-    ax4.set_ylabel('Snowfall [m]')
-    ax4.set_xlabel('Timestep [day]')
-
-
-    ax1.legend(['target', 'predicted'])
-    ax2.legend(['target', 'predicted'])
-    ax3.legend(['target', 'predicted'])
-    ax4.legend(['target', 'predicted'])
-
-
     fig.tight_layout()
     # plt.subplot_tool()
     plt.plot()
-    plt.savefig(f'Results/EXTRAPOLATE_{list_of_variables_for_simulation[-1]}_timeseries.png')
+    if NN:
+        plt.savefig(f'NewResults/time_no_driver_{list_of_variables_for_simulation[-1]}.png')
+        print('-0--0-0--0-0--0-0--0-0--0-0--0-0--0-0--0-0--0')
+        print('check saved no driver image in NewResults')
+        print('-0--0-0--0-0--0-0--0-0--0-0--0-0--0-0--0-0--0')
+    else:
+        # plt.savefig(f'NewResults/time_with_driver_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/time_EXTRAPOLATE_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/time_INTERPOLATE_{list_of_variables_for_simulation[-1]}.png')
+        # plt.savefig(f'NewResults/time_WIDE_{list_of_variables_for_simulation[-1]}.png')
+        plt.savefig(f'NewResults/_depth_15_time_SHARP_{list_of_variables_for_simulation[-1]}.png')
+
     plt.show()
     plt.close()
-
-    # # Autocorrelation plot for pattern evaluation
-    # fig, (ax1, ax2, ax3, ax4)= plt.subplots(4, 1, figsize=(15,15))
-    # fig.suptitle('Autocorrelation of simulation and emulation on several points', fontsize=18)
-    #
-    # #---- point 1
-    # ax1.acorr(point_1, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    # ax1.acorr(point_1_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-    #
-    # #---- point 2
-    # ax2.acorr(point_2, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    # ax2.acorr(point_2_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-    #
-    # #---- point 3
-    # ax3.acorr(point_3, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    # ax3.acorr(point_3_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-    #
-    # #---- point 4
-    # ax4.acorr(point_4, maxlags = plot_xvalues-1, color = 'blue', alpha = 1.0)
-    # ax4.acorr(point_4_pred, maxlags = plot_xvalues-1, color = 'red', alpha=0.4, linestyle = '-')
-    #
-    # ax1.set_title('First Point', fontsize = 14)
-    # ax2.set_title('Second Point', fontsize = 14)
-    # ax3.set_title('Third Point', fontsize = 14)
-    # ax4.set_title('Fourth Point', fontsize = 14)
-    #
-    #
-    # ax1.legend(['target', 'predicted'] )
-    # ax2.legend(['target', 'predicted'])
-    # ax3.legend(['target', 'predicted'])
-    # ax4.legend(['target', 'predicted'])
-    #
-    #
-    #
-    # # fig.tight_layout()
-    # # plt.subplot_tool()
-    # plt.plot()
-    # plt.savefig(f'Results/focussed4training_rate{list_of_variables_for_simulation[-1]}_autocorrelation.png')
-    # plt.show()
-    # plt.close()
 
     elapsed_time = time.time() - start_time_total
 
